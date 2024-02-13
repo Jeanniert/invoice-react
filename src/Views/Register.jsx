@@ -1,5 +1,5 @@
 import React, {useState} from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, Link } from 'react-router-dom'
 import {sendRequest} from '../functions'
 import DivInput from '../Components/DivInput'
 import axios from 'axios'
@@ -45,6 +45,9 @@ const Register = () => {
                 </button>
               </div>
             </form>
+            <Link to='/login'>
+                <i className='fa fa-solid fa-user-plus'></i> login
+              </Link>
           </div>
         </div>
       </div>
