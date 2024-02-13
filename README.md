@@ -9,17 +9,22 @@ Tener instalado:
 * npm
 
 ### Instalación
+Para realizar la intalacion abre tu Bash o console, y continua con los siguiente pasos:
 
 1. Clonar el repositorio
    ```sh
    git clone https://github.com/Jeanniert/invoice-react.git
    ```
-3. Instalar paquetes NPM
+2. Instalar paquetes NPM
    ```sh
    npm install
    ```
-4. Ejecutar servidor 
+3. Ejecutar servidor 
    ```js
    npm run dev
+   ```
+4. Abre en tu navegador el enlace que te sal en la consola(ejemplo).
+   ```js
+   http://localhost:5173/
    ```
 
