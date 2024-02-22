@@ -34,6 +34,8 @@ const Company = () => {
   const [pageSize,setPageSize]= useState(0);
   const NameInput= useRef();
   const close= useRef();
+  let method= '';
+  let url= '';
 
   useEffect(()=>{
     getCompany(1);
@@ -43,6 +45,17 @@ const Company = () => {
   const selectedHandler=e=>{
     setLogo(e.target.files[0]);
   }
+
+  function formatPhoneNumber(input) {
+    if (!input) return input;
+    const numberInput = input.replace(/[^\d]/g, "");
+    return numberInput;
+  }
+
+  const handlephoneNumber = (e) => {
+    const formattedPhoneNumber = formatPhoneNumber(e.target.value);
+    setPhone(formattedPhoneNumber);
+  };
 
 
 const authToken= storage.get('authToken');
@@ -56,7 +69,9 @@ const axiosInstance = axios.create({
 const send = async (e) => {
   
   e.preventDefault();
-  const form = new FormData();
+  if(operation == 1){
+
+    const form = new FormData();
     form.append("name",name);
     form.append("identification_number",identification_number);
     form.append("address",address);
@@ -64,6 +79,7 @@ const send = async (e) => {
     form.append("logo",logo);
     form.append("currency",currency);
     form.append("description",description);
+    form.append("user_id", storage.get('authUser').id);
         
   let res;
       await axiosInstance.post("api/company", form, {
@@ -82,6 +98,16 @@ const send = async (e) => {
           show_alerta(errors.response.data.message, 'error')
       })
       return res;
+
+  }else{
+      method= 'PUT';
+      url= 'api/company/'+id;
+      const form= {name:name,address:address,phone:phone,currency:currency,description:description, user_id:storage.get('authUser').id};
+      const res= await sendRequest(method,form,url,'');
+      close.current.click();
+      getCompany(page);
+    }
+  
 };
 
 
@@ -165,7 +191,10 @@ const send = async (e) => {
             {company.map( (row,i) => (
                 <tr key={row.id}>
                   <td>{(i+1)}</td>
-                  <td>{row.logo}</td>
+                  <td>
+                  <img className="avatar-60 rounded" width="60" height="60"
+                    src={'http://127.0.0.1:8000/storage/company/'+row.logo} />  
+                  </td>
                   <td>{row.name}</td>
                   <td>{row.identification_number}</td> 
                   <td>{row.address}</td>
@@ -174,7 +203,7 @@ const send = async (e) => {
                   <td>{row.description}</td>                 
                   <td>{row.user}</td> 
                   <td>
-                  <button className='btn btn-warning' data-bs-toggle='modal' data-bs-target='#modalCompany' 
+                  <button className='btn btn-warning' data-bs-toggle='modal' data-bs-target='#modalCompanyEdit' 
                   onClick={()=> openModal(2,row.name,row.identification_number,row.address,row.phone, row.logo,row.currency,row.description, row.id)}>
                     <i className='fa fa-solid fa-edit'></i>
                   </button>
@@ -195,29 +224,74 @@ const send = async (e) => {
           <div className='modal-body'>
             <form onSubmit={send}>
 
-            <DivInput type='text' icon='fa fa-solid fa-user' value= {name} className='form-control'
+            <DivInput type='text' icon='fa fa-solid fa-building' value= {name} className='form-control'
               placeholder= 'Empresa'  required='required' ref={NameInput} handleChange={(e)=>setName(e.target.value)} />
 
-            <DivInput type='text' icon='fa fa-solid fa-building' value= {identification_number} className='form-control'
+            <DivInput type='text' icon='fa fa-solid fa-address-card' value= {identification_number} className='form-control'
               placeholder= 'RIF / DNI'  required='required' ref={NameInput} handleChange={(e)=>setIdentification_number(e.target.value)} />
 
-            <DivInput type='text' icon='fa fa-solid fa-building' value= {address} className='form-control'
+            <DivInput type='text' icon='fa fa-solid fa-location-dot' value= {address} className='form-control'
               placeholder= 'Dirección'  required='required' ref={NameInput} handleChange={(e)=>setAddress(e.target.value)} />
 
-            <DivInput type='text' icon='fa fa-solid fa-phone' value= {phone} className='form-control'
-              placeholder= 'Teléfono'  required='required' ref={NameInput} handleChange={(e)=>setPhone(e.target.value)} />
+            <div className='input-group mb-3'>
+              <span className='input-group-text'>
+                <i className='fa-solid fa-phone'></i>
+              </span>
+              <input type='tel' className='form-control' minLength="11" maxLength="13"
+              placeholder='Phone' onChange={(e) => handlephoneNumber(e)} value={phone} />
+            </div>
 
             <div className='input-group mb-3'>
                     <span className='input-group-text'>
-                        <i className='fa fa-solid fa-phone'></i>
+                        <i className='fa fa-solid fa-image'></i>
                     </span>
                     <input type="file" onChange={selectedHandler} className='form-control' required='required' />
                 </div>
 
-            <DivInput type='text' icon='fa fa-solid fa-building' value= {currency} className='form-control'
+            <DivInput type='text' icon='fa fa-solid fa-coins' value= {currency} className='form-control'
               placeholder= 'Moneda'  required='required' ref={NameInput} handleChange={(e)=>setCurrency(e.target.value)} />
 
-            <DivInput type='text' icon='fa fa-solid fa-building' value= {description} className='form-control'
+            <DivInput type='text' icon='fa fa-solid fa-clipboard' value= {description} className='form-control'
+              placeholder= 'Descripción'  required='required' ref={NameInput} handleChange={(e)=>setDescription(e.target.value)} />
+              
+              <div className='d-grid col-10 mx-auto'>
+                <button className='btn btn-success'>
+                  <i className='fa fa-solid fa-save'></i>  save
+                </button>
+              </div>
+            </form>
+          </div>
+
+          <div className='modal-footer'>
+            <button className='btn btn-dark' data-bs-dismiss='modal' ref={close}> Close</button>
+          </div>
+        </Modal>
+
+        <Modal title={title} modal='modalCompanyEdit'>
+          <div className='modal-body'>
+            <form onSubmit={send}>
+
+            <DivInput type='text' icon='fa fa-solid fa-building' value= {name} className='form-control'
+              placeholder= 'Empresa'  required='required' ref={NameInput} handleChange={(e)=>setName(e.target.value)} />
+
+            <DivInput type='text' icon='fa fa-solid fa-address-card' value= {identification_number} className='form-control'
+              placeholder= 'RIF / DNI'  required='required' ref={NameInput} handleChange={(e)=>setIdentification_number(e.target.value)} />
+
+            <DivInput type='text' icon='fa fa-solid fa-location-dot' value= {address} className='form-control'
+              placeholder= 'Dirección'  required='required' ref={NameInput} handleChange={(e)=>setAddress(e.target.value)} />
+
+            <div className='input-group mb-3'>
+              <span className='input-group-text'>
+                <i className='fa-solid fa-phone'></i>
+              </span>
+              <input type='tel' className='form-control' minLength="11" maxLength="13"
+              placeholder='Phone' onChange={(e) => handlephoneNumber(e)} value={phone} />
+            </div>
+
+            <DivInput type='text' icon='fa fa-solid fa-coins' value= {currency} className='form-control'
+              placeholder= 'Moneda'  required='required' ref={NameInput} handleChange={(e)=>setCurrency(e.target.value)} />
+
+            <DivInput type='text' icon='fa fa-solid fa-clipboard' value= {description} className='form-control'
               placeholder= 'Descripción'  required='required' ref={NameInput} handleChange={(e)=>setDescription(e.target.value)} />
               
               <div className='d-grid col-10 mx-auto'>

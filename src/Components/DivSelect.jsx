@@ -15,7 +15,8 @@ export default forwardRef((
         </span>
         <select name={name} id={id} value={value} className={className}ref={input}
         required={required} onChange={(e)=> handleChange(e)}>
-     
+            
+            <option value="">Seleccionar...</option>
             {options.map((op)=> (
                 <option value={op.id} key={op.id}>{op.name}</option>
             )            

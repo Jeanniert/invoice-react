@@ -26,7 +26,7 @@ const Customers = () => {
     const [identification_number,setIdentification_number]= useState('');
     const [company,setCompany]= useState('');
 
-  const [operation,setOperation]= useState();
+  const [operation,setOperation]= useState('');
   const [title,setTitle]= useState('');
   const [classLoad,setClassLoad]= useState('');
   const [classTable,setClassTable]= useState('d-none');
@@ -58,31 +58,42 @@ const Customers = () => {
   const send = async (e) => {
   
     e.preventDefault();
-    const form = new FormData();
-      form.append("name",name);
-      form.append("identification_number",identification_number);
-      form.append("address",address);
-      form.append("phone", phone);
-      form.append("logo",logo);
-      form.append("company",company);
-          
-    let res;
+    if (operation == 1) {
+      const form = new FormData();
+        form.append("name",name);
+        form.append("identification_number",identification_number);
+        form.append("address",address);
+        form.append("phone", phone);
+        form.append("logo",logo);
+        form.append("company",company);
+        form.append("user_id", storage.get('authUser').id);    
+        let res;
         await axiosInstance.post("api/customer", form, {
         headers: {
           "Content-Type": "multipart/form-data"
         }
       }).then(
         response => {
-            res= response.data;          
+            res= response.data;        
             show_alerta(response.data.message, 'success');
+            close.current.click();
             clear();
-            getCustomers(page);
-            setTimeout( ()=> NameInput.current,focus(), 3000);
+            getCustomers(page);            
             
         }).catch( (errors)=>{
             show_alerta(errors.response.data.message, 'error')
         })
         return res;
+
+    }else{
+      method= 'PUT';
+      url= 'api/customer/'+id
+      const form= {name:name,address:address,phone:phone,company:company, user_id:storage.get('authUser').id};
+      const res= await sendRequest(method,form,url,'');
+      close.current.click();
+      getCustomers(page);
+    }
+                  
   };
 
   const getCustomers = async() =>{
@@ -91,6 +102,17 @@ const Customers = () => {
     setClassTable('')
     setClassLoad('d-none');
   }
+
+  function formatPhoneNumber(input) {
+    if (!input) return input;
+    const numberInput = input.replace(/[^\d]/g, "");
+    return numberInput;
+  }
+
+  const handlephoneNumber = (e) => {
+    const formattedPhoneNumber = formatPhoneNumber(e.target.value);
+    setPhone(formattedPhoneNumber);
+  };
 
   const deleteCustomer = (id, name)=>{
     confirmation(name,'api/customer/'+id,'/');
@@ -159,7 +181,10 @@ const Customers = () => {
             {customers.map( (row,i) => (
                 <tr key={row.id}>
                   <td>{(i+1)}</td>
-                  <td>{row.logo}</td>
+                  <td>
+                    <img className="avatar-60 rounded" width="60" height="60"
+                    src={'http://127.0.0.1:8000/storage/customers/'+row.logo} />
+                  </td>
                   <td>{row.name}</td>
                   <td>{row.address}</td>
                   <td>{row.phone}</td>
@@ -167,8 +192,8 @@ const Customers = () => {
                   <td>{row.identification_number}</td> 
                   <td>{row.user}</td> 
                   <td>
-                  <button className='btn btn-warning' data-bs-toggle='modal' data-bs-target='#modalCustomer' 
-                  onClick={()=> openModal(2,row.name,row.identification_number,row.address,row.phone, row.logo,row.company,row.id)}>
+                  <button className='btn btn-warning' data-bs-toggle='modal' data-bs-target='#modalCustomerEdit' 
+                  onClick={()=> openModal(2,row.name,row.identification_number,row.address,row.phone,row.logo,row.company,row.id)}>
                     <i className='fa fa-solid fa-edit'></i>
                   </button>
                   </td>
@@ -192,24 +217,75 @@ const Customers = () => {
                             placeholder= 'Nombre'  required='required' ref={NameInput} 
                             handleChange={(e)=>setName(e.target.value)} />
 
-            <DivInput type='text' icon='fa fa-solid fa-building' value= {identification_number} className='form-control'
+            <DivInput type='text' icon='fa fa-solid fa-address-card' value= {identification_number} className='form-control'
                                 placeholder= 'RIF / DNI'  required='required' ref={NameInput} 
                                 handleChange={(e)=>setIdentification_number(e.target.value)} />
 
-                            <DivInput type='text' icon='fa fa-solid fa-building' value= {address} className='form-control'
+            <DivInput type='text' icon='fa fa-solid fa-location-dot' value= {address} className='form-control'
                                 placeholder= 'Dirección'  required='required' ref={NameInput} 
                                 handleChange={(e)=>setAddress(e.target.value)} />
 
-                            <DivInput type='text' icon='fa fa-solid fa-phone' value= {phone} className='form-control'
-                                placeholder= 'Teléfono'  required='required' ref={NameInput} 
-                                handleChange={(e)=>setPhone(e.target.value)} />
-
-                              <div className='input-group mb-3'>
+                            <div className='input-group mb-3'>
+                                <span className='input-group-text'>
+                                  <i className='fa-solid fa-phone'></i>
+                                </span>
+                                <input type='tel' className='form-control' minLength="11" maxLength="13"
+                                placeholder='Phone' onChange={(e) => handlephoneNumber(e)} value={phone} />
+                            </div>
+                             
+                            
+                                  <div className='input-group mb-3'>
                                   <span className='input-group-text'>
-                                      <i className='fa fa-solid fa-phone'></i>
+                                      <i className='fa fa-solid fa-image'></i>
                                   </span>
                                   <input type="file" onChange={selectedHandler} className='form-control' required='required' />
-                              </div>
+                                  </div>
+                               
+
+                            <DivInput type='text' icon='fa fa-solid fa-building' value= {company} className='form-control'
+                                placeholder= 'Empresa'  required='required' ref={NameInput} 
+                                handleChange={(e)=>setCompany(e.target.value)} />
+              
+              <div className='d-grid col-10 mx-auto'>
+                <button className='btn btn-success'>
+                  <i className='fa fa-solid fa-save'></i>  save
+                </button>
+              </div>
+            </form>
+          </div>
+
+          <div className='modal-footer'>
+            <button className='btn btn-dark' data-bs-dismiss='modal' ref={close}> Close</button>
+          </div>
+        </Modal>
+
+
+
+
+        <Modal title={title} modal='modalCustomerEdit'>
+          <div className='modal-body'>
+            <form onSubmit={send}>
+
+            <DivInput type='text' icon='fa fa-solid fa-user' value= {name} className='form-control'
+                            placeholder= 'Nombre'  required='required' ref={NameInput} 
+                            handleChange={(e)=>setName(e.target.value)} />
+
+            <DivInput type='text' icon='fa fa-solid fa-address-card' value= {identification_number} className='form-control'
+                                placeholder= 'RIF / DNI'  required='required' ref={NameInput} 
+                                handleChange={(e)=>setIdentification_number(e.target.value)} />
+
+            <DivInput type='text' icon='fa fa-solid fa-location-dot' value= {address} className='form-control'
+                                placeholder= 'Dirección'  required='required' ref={NameInput} 
+                                handleChange={(e)=>setAddress(e.target.value)} />
+                             
+                             <div className='input-group mb-3'>
+                                <span className='input-group-text'>
+                                  <i className='fa-solid fa-phone'></i>
+                                </span>
+                                <input type='tel' className='form-control' minLength="13" maxLength="13"
+                                placeholder='Phone' onChange={(e) => handlephoneNumber(e)} value={phone} />
+                            </div>
+                               
 
                             <DivInput type='text' icon='fa fa-solid fa-building' value= {company} className='form-control'
                                 placeholder= 'Empresa'  required='required' ref={NameInput} 
