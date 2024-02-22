@@ -44,12 +44,16 @@ const Index = () => {
   const [pageSize,setPageSize]= useState(0);
   const close= useRef();
   let montoTotal = 0;
+  const fecha = new Date();
+const meses = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Setiembre", "Octubre", "Noviembre", "Diciembre"];
+const dias = ["Domingo","Lunes", "Martes", "Miercoles", "Jueves", "Viernes", "Sabado" ];
+const date= dias[fecha.getDay()]+' '+fecha.getDate()+' '+meses[fecha.getMonth()]+' '+fecha.getFullYear();
+
 
   useEffect(()=>{
     getInvoice(1);
     getCompany();
-    getCustomer(); 
-
+    getCustomer();
   },[]);
 
   const getInvoice= async(page)=>{
@@ -119,7 +123,7 @@ const handleDeleteInput = (index) => {
   const  save = async(e)=>{
     e.preventDefault();
 
-    const form= {customer_id:customerId,company_id:companyId,total:total,tax:tax,product:product,subtotal:subtotal,totalWithTax:subtotal};
+    const form= {customer_id:customerId,company_id:companyId,total:total,tax:tax,product:product,subtotal:subtotal,totalWithTax:totalWithTax,date:date};
     const res= await sendRequest(method,form,url, '');
     close.current.click();  
     getInvoice(1);
@@ -313,30 +317,22 @@ const handleDeleteInput = (index) => {
                             <div className="row">
                                 <div className="col-lg-6 col-sm-6">
                                     <div className="logo">
-                                    <img className="avatar-60 rounded" width="60" height="60" src={'http://127.0.0.1:8000/storage/company/'+report['companyLogo']} />  
+                                    <img className="avatar-60 rounded" width="100" height="70" src={'http://127.0.0.1:8000/storage/company/'+report['companyLogo']} />  
                                     </div>
                                 </div>
                                 <div className="col-lg-6 col-sm-6">
                                     <div className="invoice">
-                                        <h3>#<span>{report['correlative']}</span></h3>
+                                        <h5>#<span>{report['correlative']}</span></h5>
+                                        <p className="invo-addr-1">
+                                        {report['date']}
+                                        </p>
                                     </div>
                                 </div>
                             </div>
                         </div>
+                        <br />
                         <div className="invoice-info">
-                            <div className="row">
-                                <div className="col-sm-6 mb-50">
-                                    <div className="invoice-number">
-                                        <h4 className="inv-title-1">Fecha de la factura:</h4>
-                                        <p className="invo-addr-1">
-                                        {report['created_at']}
-                                        </p>
-                                    </div>
-                                </div>
-                                <div className="col-sm-6 text-end mb-50">
-                                    
-                                </div>
-                            </div>
+                            
                             <div className="row">
                                 <div className="col-sm-6 mb-50">
                                     <h4 className="inv-title-1" >Cliente</h4>
@@ -345,10 +341,11 @@ const handleDeleteInput = (index) => {
                                     <p className="inv-from-1">{report['customerPhone']}</p>
                                     <p className="inv-from-2"></p>
                                 </div>
-                                <div className="col-sm-6 text-end mb-50">
+                                <div className="col-sm-6 text-end mb-10">
                                     <h4 className="inv-title-1">Empresa</h4>
                                     <p className="inv-from-1">{report['company']}</p>
                                     <p className="inv-from-2">{report['companyAddress']}</p>
+                                    <p className="inv-from-1">{report['companyPhone']}</p>
                                 </div>
                             </div>
                         </div>
@@ -370,6 +367,18 @@ const handleDeleteInput = (index) => {
                                         <td >{row.unit_price}</td>
                                       </tr>
                                     ))} 
+                                        <tr>
+                                            <td><strong className="text-danger">Total parcial: </strong></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td><strong className="text-danger">${report['subtotal']}</strong></td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong className="text-danger">Impuesto ({report['tax']}%): </strong></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td><strong className="text-danger">${report['totalWithTax']}</strong></td>
+                                        </tr>
                                         <tr>
                                             <td><strong className="text-danger">Total</strong></td>
                                             <td></td>

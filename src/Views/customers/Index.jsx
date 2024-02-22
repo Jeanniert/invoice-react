@@ -38,6 +38,7 @@ const Customers = () => {
   let method= '';
   let url= '';
 
+
   useEffect(()=>{
     getCustomers(1);
 
@@ -45,6 +46,9 @@ const Customers = () => {
 
   const selectedHandler=e=>{
     setLogo(e.target.files[0]);
+  }
+  function handleCloseModal(){
+    close.current.click();
   }
 
   const authToken= storage.get('authToken');
@@ -76,13 +80,13 @@ const Customers = () => {
         response => {
             res= response.data;        
             show_alerta(response.data.message, 'success');
-            close.current.click();
             clear();
-            getCustomers(page);            
+            getCustomers(page);           
             
         }).catch( (errors)=>{
             show_alerta(errors.response.data.message, 'error')
         })
+        close.current.click();
         return res;
 
     }else{
@@ -128,7 +132,7 @@ const Customers = () => {
       setCompany('');
   }
   
-  const openModal= (op,name,identification_number,address,phone,logo,company,em)=> {
+  const openModal= (op,name,identification_number,address,phone,company,em)=> {
     clear();
     setTimeout(()=> NameInput.current.focus(), 600);
     setOperation(op);
@@ -143,7 +147,6 @@ const Customers = () => {
       setIdentification_number(identification_number);
       setAddress(address);
       setPhone(phone);
-      setLogo(logo);
       setCompany(company);
     }
   }
