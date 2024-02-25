@@ -20,42 +20,54 @@ const Nav = () => {
     }
 
   return (
-   <nav className="navbar navbar-expand-lg navbar-white bg-info">
-        <div className="container-fluid">
-            <a className="navbar-brand">INVOICE</a>
-            <button className="navbar-toggler" type="button" data-bs-toggler= 'collapse'
-            data-bs-target="#nav" aria-controls= "navbarSupportedContent">
-                <span className="navbar-toggler icon"></span>
-            </button>
-        
+  
 
-        {storage.get('authUser') ? (
-            <div className="collapse navbar-collapse" id="nav">
-                <ul className="navbar-nav mx-auto mb-2">                    
-                    <li className="nav-item px-lg-5 h4">
-                        {storage.get('authUser').name}
-                    </li>
-                    <li className="nav-item px-lg-5">
-                        <Link to="/" className= "nav-link">CLIENTES</Link>
-                    </li>
-                    <li className="nav-item px-lg-5">
-                        <Link to="/company" className= "nav-link">EMPRESAS</Link>
-                    </li>
-                    <li className="nav-item px-lg-5">
-                        <Link to="/invoice" className= "nav-link">FACTURAR</Link>
-                    </li>
-                </ul>
-                <ul className="navbar-nav mx-auto mb-2"> 
-                    <li className="nav-item px-lg-5">
-                       <button className="btn btn-info" onClick={logout}>Logout</button>
-                    </li>
-                </ul>
-                
-            </div>
-        ):''}
-        
-        </div>
-   </nav>
+<nav className="navbar navbar-expand-lg navbar-light bg-body-tertiary">
+{storage.get('authUser') ? (
+  <div className="container-fluid">
+    <button
+      data-mdb-collapse-init
+      className="navbar-toggler"
+      type="button"
+      data-mdb-target="#navbarSupportedContent"
+      aria-controls="navbarSupportedContent"
+      aria-expanded="false"
+      aria-label="Toggle navigation"
+    >
+      <i className="fas fa-bars"></i>
+    </button>
+
+    <div className="collapse navbar-collapse" id="navbarSupportedContent">
+      <a className="navbar-brand mt-2 mt-lg-0" href="#">
+        <img
+          src="/naykana-dark.png"
+          height="60"
+          alt="MDB Logo"
+          loading="lazy"
+        />
+      </a>
+      <ul className="navbar-nav me-auto mb-2 mb-lg-0">
+        <li className="nav-item">
+          <a className="nav-link" href="/">CLIENTES</a>
+        </li>
+        <li className="nav-item">
+          <a className="nav-link" href="/company">EMPRESAS</a>
+        </li>
+        <li className="nav-item">
+          <a className="nav-link" href="/invoice">FACTURAR</a>
+        </li>
+      </ul>
+    </div>
+    <div className="d-flex align-items-center">
+
+      <div className="dropdown">
+        <button className="btn" onClick={logout}>
+        <i className="fa-solid fa-right-from-bracket"></i> Logout</button>
+      </div>
+    </div>
+  </div>
+  ):''}
+</nav>
   )
 }
 

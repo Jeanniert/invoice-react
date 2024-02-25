@@ -163,62 +163,68 @@ const send = async (e) => {
 
   }
   return (
-    <div className='container-fluid'>
+    <div className='container-md'>
+      <div className="card ">
+        <div className="card-header">
+          Lista de Empresas
+        </div> 
         <DivAdd>
           <button className='btn btn-info' data-bs-toggle='modal' data-bs-target='#modalCompany' 
           onClick={()=> openModal(1)}> <i className='fa fa-solid fa-circle-plus'></i> add
           </button>
         </DivAdd>
 
-        <DivTable col='10' off='1' classLoad={classLoad} classTable={classTable}>
-          <table className='table table-bordered'>
-            <thead>
-            <tr>
-                <th>N°</th>
-                <th>LOGO</th>
-                <th>EMPRESA</th>
-                <th>RIF/DNI</th>
-                <th>DIRECCIÓN</th>
-                <th>TELÉFONO</th>               
-                <th>MONEDA</th>
-                <th>DESCRIPCIÓN</th>                
-                <th>USUARIO</th>
-                <th></th>
-                <th></th>
-              </tr>
-            </thead>
-            <tbody className='table-group-divider'>
-            {company.map( (row,i) => (
-                <tr key={row.id}>
-                  <td>{(i+1)}</td>
-                  <td>
-                  <img className="avatar-60 rounded" width="60" height="60"
-                    src={'http://127.0.0.1:8000/storage/company/'+row.logo} />  
-                  </td>
-                  <td>{row.name}</td>
-                  <td>{row.identification_number}</td> 
-                  <td>{row.address}</td>
-                  <td>{row.phone}</td>
-                  <td>{row.currency}</td>
-                  <td>{row.description}</td>                 
-                  <td>{row.user}</td> 
-                  <td>
-                  <button className='btn btn-warning' data-bs-toggle='modal' data-bs-target='#modalCompanyEdit' 
-                  onClick={()=> openModal(2,row.name,row.identification_number,row.address,row.phone, row.logo,row.currency,row.description, row.id)}>
-                    <i className='fa fa-solid fa-edit'></i>
-                  </button>
-                  </td>
-                  <td>
-                    <button className='btn btn-danger' onClick={()=> deleteCompany(row.id, row.name)}>
-                      <i className='fa fa-solid fa-trash'></i>
-                    </button>
-                  </td>
+        <div className="card-body">
+          <DivTable col='10' off='1' classLoad={classLoad} classTable={classTable}>
+            <table className='table table-striped'>
+              <thead>
+              <tr>
+                  <th>N°</th>
+                  <th>LOGO</th>
+                  <th>EMPRESA</th>
+                  <th>RIF/DNI</th>
+                  <th>DIRECCIÓN</th>
+                  <th>TELÉFONO</th>               
+                  <th>MONEDA</th>
+                  <th>DESCRIPCIÓN</th>                
+                  <th>USUARIO</th>
+                  <th></th>
+                  <th></th>
                 </tr>
-              ))}            
-            </tbody>
-          </table>
-          <PaginationControl changePage={page=> goPage(page)} next={true} limit={pageSize} page={page} total={rows}/>
-        </DivTable>
+              </thead>
+              <tbody className='table-group-divider'>
+              {company.map( (row,i) => (
+                  <tr key={row.id}>
+                    <td>{(i+1)}</td>
+                    <td>
+                    <img className="avatar-60 rounded" width="40" height="40"
+                      src={'http://127.0.0.1:8000/storage/company/'+row.logo} />  
+                    </td>
+                    <td>{row.name}</td>
+                    <td>{row.identification_number}</td> 
+                    <td>{row.address}</td>
+                    <td>{row.phone}</td>
+                    <td>{row.currency}</td>
+                    <td>{row.description}</td>                 
+                    <td>{row.user}</td> 
+                    <td>
+                    <button className='btn btn-warning btn-sm' data-bs-toggle='modal' data-bs-target='#modalCompanyEdit' 
+                    onClick={()=> openModal(2,row.name,row.identification_number,row.address,row.phone, row.logo,row.currency,row.description, row.id)}>
+                      <i className='fa fa-solid fa-edit'></i>
+                    </button>
+                    </td>
+                    <td>
+                      <button className='btn btn-danger btn-sm ' onClick={()=> deleteCompany(row.id, row.name)}>
+                        <i className='fa fa-solid fa-trash'></i>
+                      </button>
+                    </td>
+                  </tr>
+                ))}            
+              </tbody>
+            </table>
+            <PaginationControl changePage={page=> goPage(page)} next={true} limit={pageSize} page={page} total={rows}/>
+          </DivTable>
+          </div>
 
         <Modal title={title} modal='modalCompany'>
           <div className='modal-body'>
@@ -308,6 +314,7 @@ const send = async (e) => {
         </Modal>
 
     </div>
+  </div>
   )
 }
 

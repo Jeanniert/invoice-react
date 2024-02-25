@@ -47,9 +47,6 @@ const Customers = () => {
   const selectedHandler=e=>{
     setLogo(e.target.files[0]);
   }
-  function handleCloseModal(){
-    close.current.click();
-  }
 
   const authToken= storage.get('authToken');
   const axiosInstance = axios.create({
@@ -72,6 +69,7 @@ const Customers = () => {
         form.append("company",company);
         form.append("user_id", storage.get('authUser').id);    
         let res;
+        
         await axiosInstance.post("api/customer", form, {
         headers: {
           "Content-Type": "multipart/form-data"
@@ -91,7 +89,7 @@ const Customers = () => {
 
     }else{
       method= 'PUT';
-      url= 'api/customer/'+id
+      url= 'api/customer/'+id;
       const form= {name:name,address:address,phone:phone,company:company, user_id:storage.get('authUser').id};
       const res= await sendRequest(method,form,url,'');
       close.current.click();
@@ -157,60 +155,66 @@ const Customers = () => {
 
   }
   return (
-    <div className='container-fluid'>
+    <div className='container-md'>
+      <div className="card ">
+        <div className="card-header">
+          Lista de Clintes
+        </div> 
         <DivAdd>
           <button className='btn btn-info' data-bs-toggle='modal' data-bs-target='#modalCustomer' 
           onClick={()=> openModal(1)}> <i className='fa fa-solid fa-circle-plus'></i> add
           </button>
         </DivAdd>
 
-        <DivTable col='10' off='1' classLoad={classLoad} classTable={classTable}>
-          <table className='table table-bordered'>
-            <thead>
-            <tr>
-                <th>N°</th>
-                <th>LOGO</th>
-                <th>CLIENTE</th>
-                <th>DIRECCIÓN</th>
-                <th>TELÉFONO</th>               
-                <th>EMPRESA</th>
-                <th>RIF / DNI</th>
-                <th>USUARIO</th>
-                <th></th>
-                <th></th>
-              </tr>
-            </thead>
-            <tbody className='table-group-divider'>
-            {customers.map( (row,i) => (
-                <tr key={row.id}>
-                  <td>{(i+1)}</td>
-                  <td>
-                    <img className="avatar-60 rounded" width="60" height="60"
-                    src={'http://127.0.0.1:8000/storage/customers/'+row.logo} />
-                  </td>
-                  <td>{row.name}</td>
-                  <td>{row.address}</td>
-                  <td>{row.phone}</td>
-                  <td>{row.company}</td>
-                  <td>{row.identification_number}</td> 
-                  <td>{row.user}</td> 
-                  <td>
-                  <button className='btn btn-warning' data-bs-toggle='modal' data-bs-target='#modalCustomerEdit' 
-                  onClick={()=> openModal(2,row.name,row.identification_number,row.address,row.phone,row.logo,row.company,row.id)}>
-                    <i className='fa fa-solid fa-edit'></i>
-                  </button>
-                  </td>
-                  <td>
-                    <button className='btn btn-danger' onClick={()=> deleteCustomer(row.id, row.name)}>
-                      <i className='fa fa-solid fa-trash'></i>
-                    </button>
-                  </td>
+        <div className="card-body">
+          <DivTable col='10' off='1' classLoad={classLoad} classTable={classTable}>
+            <table className='table table-striped'>
+              <thead>
+              <tr>
+                  <th>N°</th>
+                  <th>LOGO</th>
+                  <th>CLIENTE</th>
+                  <th>DIRECCIÓN</th>
+                  <th>TELÉFONO</th>               
+                  <th>EMPRESA</th>
+                  <th>RIF / DNI</th>
+                  <th>USUARIO</th>
+                  <th></th>
+                  <th></th>
                 </tr>
-              ))}            
-            </tbody>
-          </table>
-          <PaginationControl changePage={page=> goPage(page)} next={true} limit={pageSize} page={page} total={rows}/>
-        </DivTable>
+              </thead>
+              <tbody className='table-group-divider'>
+              {customers.map( (row,i) => (
+                  <tr key={row.id}>
+                    <td>{(i+1)}</td>
+                    <td>
+                      <img className="avatar-60 rounded" width="40" height="40"
+                      src={'http://127.0.0.1:8000/storage/customers/'+row.logo} />
+                    </td>
+                    <td>{row.name}</td>
+                    <td>{row.address}</td>
+                    <td>{row.phone}</td>
+                    <td>{row.company}</td>
+                    <td>{row.identification_number}</td> 
+                    <td>{row.user}</td> 
+                    <td>
+                    <button className='btn btn-warning btn-sm' data-bs-toggle='modal' data-bs-target='#modalCustomerEdit' 
+                    onClick={()=> openModal(2,row.name,row.identification_number,row.address,row.phone,row.company,row.id)}>
+                      <i className='fa fa-solid fa-edit'></i>
+                    </button>
+                    </td>
+                    <td>
+                      <button className='btn btn-danger btn-sm' onClick={()=> deleteCustomer(row.id, row.name)}>
+                        <i className='fa fa-solid fa-trash'></i>
+                      </button>
+                    </td>
+                  </tr>
+                ))}            
+              </tbody>
+            </table>
+            <PaginationControl changePage={page=> goPage(page)} next={true} limit={pageSize} page={page} total={rows}/>
+          </DivTable>
+        </div>
 
         <Modal title={title} modal='modalCustomer'>
           <div className='modal-body'>
@@ -262,9 +266,6 @@ const Customers = () => {
           </div>
         </Modal>
 
-
-
-
         <Modal title={title} modal='modalCustomerEdit'>
           <div className='modal-body'>
             <form onSubmit={send}>
@@ -308,6 +309,7 @@ const Customers = () => {
         </Modal>
 
     </div>
+  </div>
   )
 }
 
